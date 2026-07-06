@@ -1,0 +1,2986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Collection</title>
+<style>
+  :root {
+    --white: #ffffff;
+    --panel: #f5f5f7;
+    --ink: #1d1d1f;
+    --muted: #86868b;
+    --red: #d4293d;
+    --line: #d2d2d7;
+  }
+
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: color-mix(in srgb, var(--white) 82%, transparent);
+    backdrop-filter: blur(16px) saturate(1.4);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar .brand {
+    font-weight: 700;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .topbar nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+  }
+  .topbar nav::-webkit-scrollbar { display: none; }
+  .topbar nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
+  }
+  .topbar nav a:hover { background: var(--panel); color: var(--ink); }
+  .topbar .search-box {
+    display: flex;
+    align-items: center;
+    background: var(--panel);
+    border-radius: 20px;
+    padding: 6px 14px;
+    gap: 6px;
+  }
+  .topbar .search-box input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 13px;
+    color: var(--ink);
+    width: 140px;
+    font-family: inherit;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--white);
+    color: var(--ink);
+    font-family: -apple-system, "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 10% 5%, rgba(212,41,61,0.06), transparent 32%),
+      radial-gradient(circle at 88% 0%, rgba(90,140,255,0.07), transparent 30%),
+      radial-gradient(circle at 65% 22%, rgba(255,190,90,0.05), transparent 28%),
+      radial-gradient(circle at 25% 40%, rgba(160,110,255,0.045), transparent 30%),
+      linear-gradient(180deg, #ffffff 0%, #fbfbfd 55%, #ffffff 100%);
+    background-attachment: fixed;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 86vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    width: 140%;
+    height: 70%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(245,245,247,0) 70%),
+      conic-gradient(from 200deg at 50% 30%, rgba(212,41,61,0.06), rgba(120,150,255,0.05), rgba(255,200,120,0.05), rgba(212,41,61,0.06));
+    filter: blur(40px);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .hero > * { position: relative; z-index: 1; }
+  .hero .eyebrow {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--red);
+    letter-spacing: 0.02em;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(48px, 9vw, 104px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+  }
+  .hero p {
+    margin-top: 22px;
+    font-size: clamp(18px, 2.4vw, 24px);
+    color: var(--muted);
+    max-width: 640px;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 64px;
+    margin-top: 64px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stat-num {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 40px 32px 140px; }
+
+  .series-block { margin-bottom: 96px; }
+  .series-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+    margin-bottom: 36px;
+  }
+  .series-head h2 {
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .series-count {
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 32px;
+  }
+  @media (max-width: 900px) {
+    .card-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero-stats { gap: 36px; }
+  }
+  @media (max-width: 560px) {
+    .card-grid { grid-template-columns: 1fr; }
+  }
+
+  .card { display: flex; flex-direction: column; }
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .photo-slot {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: linear-gradient(145deg, #fbfbfd 0%, #f0f0f2 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.05);
+    transition: transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s ease;
+  }
+  .card:hover .photo-slot {
+    transform: translateY(-6px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.06), 0 20px 40px rgba(0,0,0,0.08);
+  }
+  .photo-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    padding: 6px;
+  }
+  .missing-label {
+    display: none;
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 10px;
+    word-break: break-all;
+  }
+  .photo-slot.missing img { display: none; }
+  .photo-slot.missing .missing-label { display: block; }
+  .photo-slot.missing { border: 1px dashed var(--line); }
+
+  .card-body { padding: 16px 4px 0; }
+  .card-name {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .card-num {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: "SF Mono", "JetBrains Mono", monospace;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 60px 24px 80px;
+    border-top: 1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">The Collection</div>
+  <nav><a href="#s0">Hot</a><a href="#s1">HOT</a><a href="#s2">HOTWHEELS</a><a href="#s3">HOTWHEELS</a><a href="#s4">HOTWHEELS</a><a href="#s5">HOTWHEELS</a><a href="#s6">HOTWHEELS</a><a href="#s7">HOTWHEELS</a><a href="#s8">TRACK</a><a href="#s9">ULTRA</a><a href="#s10">ULTRA</a><a href="#s11">SPEED</a><a href="#s12">GIFT</a><a href="#s13">HWs</a><a href="#s14">HWs</a><a href="#s15">HWs</a><a href="#s16">HWs</a><a href="#s17">HWs CAR CULTURE (CON…</a><a href="#s18">HWs</a><a href="#s19">HWs</a><a href="#s20">HWs</a><a href="#s21">HWs</a><a href="#s22">HWs</a><a href="#s23">HWs</a><a href="#s24">HWs</a><a href="#s25">HWs</a><a href="#s26">HOTWHEELS</a><a href="#s27">HOTWHEELS</a><a href="#s28">MATCHBOX</a></nav>
+  <div class="search-box">
+    <span>&#128269;</span>
+    <input type="text" id="searchInput" placeholder="Search cars...">
+  </div>
+</div>
+
+<section class="hero">
+  <div class="eyebrow">Personal Diecast Registry</div>
+  <h1>The Collection.</h1>
+  <p>Every Hot Wheels and Matchbox casting on the shelf, organized by series.</p>
+  <div class="hero-stats">
+    <div><div class="stat-num">246</div><div class="stat-label">CARS OWNED</div></div>
+    <div><div class="stat-num">242</div><div class="stat-label">UNIQUE CASTINGS</div></div>
+    <div><div class="stat-num">29</div><div class="stat-label">SERIES &amp; SETS</div></div>
+    <div><div class="stat-num">2005–25</div><div class="stat-label">YEARS SPANNED</div></div>
+  </div>
+</section>
+
+<main>
+  
+    <section class="series-block" id="s0">
+      <div class="series-head">
+        <h2>Hot Wheels 2024</h2>
+        <span class="series-count">120 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="muscle and blown">
+        <div class="photo-slot" data-file="05_muscle-and-blown.jpg">
+          <img src="photos/05_muscle-and-blown.jpg" onerror="this.parentElement.classList.add('missing')" alt="Muscle and Blown">
+          <div class="missing-label">05_muscle-and-blown.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Muscle and Blown</div>
+          <div class="card-num">05</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="max steel">
+        <div class="photo-slot" data-file="19_max-steel.jpg">
+          <img src="photos/19_max-steel.jpg" onerror="this.parentElement.classList.add('missing')" alt="Max Steel">
+          <div class="missing-label">19_max-steel.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Max Steel</div>
+          <div class="card-num">19</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="87 dodge d100">
+        <div class="photo-slot" data-file="38_87-dodge-d100.jpg">
+          <img src="photos/38_87-dodge-d100.jpg" onerror="this.parentElement.classList.add('missing')" alt="87 Dodge D100">
+          <div class="missing-label">38_87-dodge-d100.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">87 Dodge D100</div>
+          <div class="card-num">38</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="batman & robin batmobile">
+        <div class="photo-slot" data-file="54_batman-robin-batmobile.jpg">
+          <img src="photos/54_batman-robin-batmobile.jpg" onerror="this.parentElement.classList.add('missing')" alt="Batman & Robin Batmobile">
+          <div class="missing-label">54_batman-robin-batmobile.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Batman & Robin Batmobile</div>
+          <div class="card-num">54</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="hw ultimate t-rex transporter">
+        <div class="photo-slot" data-file="55_hw-ultimate-t-rex-transporter.jpg">
+          <img src="photos/55_hw-ultimate-t-rex-transporter.jpg" onerror="this.parentElement.classList.add('missing')" alt="HW Ultimate T-Rex Transporter">
+          <div class="missing-label">55_hw-ultimate-t-rex-transporter.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">HW Ultimate T-Rex Transporter</div>
+          <div class="card-num">55</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="baja bison t5">
+        <div class="photo-slot" data-file="58_baja-bison-t5.jpg">
+          <img src="photos/58_baja-bison-t5.jpg" onerror="this.parentElement.classList.add('missing')" alt="Baja Bison T5">
+          <div class="missing-label">58_baja-bison-t5.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Baja Bison T5</div>
+          <div class="card-num">58</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mod rod">
+        <div class="photo-slot" data-file="61_mod-rod.jpg">
+          <img src="photos/61_mod-rod.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mod Rod">
+          <div class="missing-label">61_mod-rod.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mod Rod</div>
+          <div class="card-num">61</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="wheelie chair">
+        <div class="photo-slot" data-file="64_wheelie-chair.jpg">
+          <img src="photos/64_wheelie-chair.jpg" onerror="this.parentElement.classList.add('missing')" alt="Wheelie Chair">
+          <div class="missing-label">64_wheelie-chair.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Wheelie Chair</div>
+          <div class="card-num">64</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="surfin school bus">
+        <div class="photo-slot" data-file="65_surfin-school-bus.jpg">
+          <img src="photos/65_surfin-school-bus.jpg" onerror="this.parentElement.classList.add('missing')" alt="Surfin School Bus">
+          <div class="missing-label">65_surfin-school-bus.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Surfin School Bus</div>
+          <div class="card-num">65</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="hotwheeler">
+        <div class="photo-slot" data-file="66_hotwheeler.jpg">
+          <img src="photos/66_hotwheeler.jpg" onerror="this.parentElement.classList.add('missing')" alt="Hotwheeler">
+          <div class="missing-label">66_hotwheeler.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Hotwheeler</div>
+          <div class="card-num">66</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="57 jeep fc">
+        <div class="photo-slot" data-file="68_57-jeep-fc.jpg">
+          <img src="photos/68_57-jeep-fc.jpg" onerror="this.parentElement.classList.add('missing')" alt="57 Jeep FC">
+          <div class="missing-label">68_57-jeep-fc.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">57 Jeep FC</div>
+          <div class="card-num">68</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="15 mazda mx-5 miata">
+        <div class="photo-slot" data-file="69_15-mazda-mx5-miata.jpg">
+          <img src="photos/69_15-mazda-mx5-miata.jpg" onerror="this.parentElement.classList.add('missing')" alt="15 Mazda MX-5 Miata">
+          <div class="missing-label">69_15-mazda-mx5-miata.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">15 Mazda MX-5 Miata</div>
+          <div class="card-num">69</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mclaren solus gt">
+        <div class="photo-slot" data-file="70_mclaren-solus-gt.jpg">
+          <img src="photos/70_mclaren-solus-gt.jpg" onerror="this.parentElement.classList.add('missing')" alt="McLaren Solus GT">
+          <div class="missing-label">70_mclaren-solus-gt.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">McLaren Solus GT</div>
+          <div class="card-num">70</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mo-stash">
+        <div class="photo-slot" data-file="73_mo-stash.jpg">
+          <img src="photos/73_mo-stash.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mo-Stash">
+          <div class="missing-label">73_mo-stash.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mo-Stash</div>
+          <div class="card-num">73</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="rockin' railer">
+        <div class="photo-slot" data-file="75_rockin-railer.jpg">
+          <img src="photos/75_rockin-railer.jpg" onerror="this.parentElement.classList.add('missing')" alt="Rockin' Railer">
+          <div class="missing-label">75_rockin-railer.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Rockin' Railer</div>
+          <div class="card-num">75</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mazda rx-7">
+        <div class="photo-slot" data-file="80_mazda-rx7.jpg">
+          <img src="photos/80_mazda-rx7.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mazda RX-7">
+          <div class="missing-label">80_mazda-rx7.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mazda RX-7</div>
+          <div class="card-num">80</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="67 chevy c10">
+        <div class="photo-slot" data-file="83_67-chevy-c10.jpg">
+          <img src="photos/83_67-chevy-c10.jpg" onerror="this.parentElement.classList.add('missing')" alt="67 Chevy C10">
+          <div class="missing-label">83_67-chevy-c10.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">67 Chevy C10</div>
+          <div class="card-num">83</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="delorean alphas">
+        <div class="photo-slot" data-file="85_delorean-alphas.jpg">
+          <img src="photos/85_delorean-alphas.jpg" onerror="this.parentElement.classList.add('missing')" alt="DeLorean Alphas">
+          <div class="missing-label">85_delorean-alphas.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">DeLorean Alphas</div>
+          <div class="card-num">85</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="10 camaro ss">
+        <div class="photo-slot" data-file="86_10-camaro-ss.jpg">
+          <img src="photos/86_10-camaro-ss.jpg" onerror="this.parentElement.classList.add('missing')" alt="10 Camaro SS">
+          <div class="missing-label">86_10-camaro-ss.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">10 Camaro SS</div>
+          <div class="card-num">86</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="piranha terror">
+        <div class="photo-slot" data-file="87_piranha-terror.jpg">
+          <img src="photos/87_piranha-terror.jpg" onerror="this.parentElement.classList.add('missing')" alt="Piranha Terror">
+          <div class="missing-label">87_piranha-terror.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Piranha Terror</div>
+          <div class="card-num">87</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="land rover series ii">
+        <div class="photo-slot" data-file="92_land-rover-series-ii.jpg">
+          <img src="photos/92_land-rover-series-ii.jpg" onerror="this.parentElement.classList.add('missing')" alt="Land Rover Series II">
+          <div class="missing-label">92_land-rover-series-ii.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Land Rover Series II</div>
+          <div class="card-num">92</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="boom car">
+        <div class="photo-slot" data-file="94_boom-car.jpg">
+          <img src="photos/94_boom-car.jpg" onerror="this.parentElement.classList.add('missing')" alt="Boom Car">
+          <div class="missing-label">94_boom-car.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Boom Car</div>
+          <div class="card-num">94</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="nissan skyline gt-r (godzilla) bcnr33">
+        <div class="photo-slot" data-file="96_nissan-skyline-gtr-godzilla-bcnr33.jpg">
+          <img src="photos/96_nissan-skyline-gtr-godzilla-bcnr33.jpg" onerror="this.parentElement.classList.add('missing')" alt="Nissan Skyline GT-R (Godzilla) BCNR33">
+          <div class="missing-label">96_nissan-skyline-gtr-godzilla-bcnr33.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Nissan Skyline GT-R (Godzilla) BCNR33</div>
+          <div class="card-num">96</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="23 ram 1500">
+        <div class="photo-slot" data-file="97_23-ram-1500.jpg">
+          <img src="photos/97_23-ram-1500.jpg" onerror="this.parentElement.classList.add('missing')" alt="23 Ram 1500">
+          <div class="missing-label">97_23-ram-1500.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">23 Ram 1500</div>
+          <div class="card-num">97</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="alfa romeo gtv6 3.0">
+        <div class="photo-slot" data-file="98_alfa-romeo-gtv6-30.jpg">
+          <img src="photos/98_alfa-romeo-gtv6-30.jpg" onerror="this.parentElement.classList.add('missing')" alt="Alfa Romeo GTV6 3.0">
+          <div class="missing-label">98_alfa-romeo-gtv6-30.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Alfa Romeo GTV6 3.0</div>
+          <div class="card-num">98</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="87 audi quattro">
+        <div class="photo-slot" data-file="102_87-audi-quattro.jpg">
+          <img src="photos/102_87-audi-quattro.jpg" onerror="this.parentElement.classList.add('missing')" alt="87 Audi Quattro">
+          <div class="missing-label">102_87-audi-quattro.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">87 Audi Quattro</div>
+          <div class="card-num">102</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="flippin fast">
+        <div class="photo-slot" data-file="103_flippin-fast.jpg">
+          <img src="photos/103_flippin-fast.jpg" onerror="this.parentElement.classList.add('missing')" alt="Flippin Fast">
+          <div class="missing-label">103_flippin-fast.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Flippin Fast</div>
+          <div class="card-num">103</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="surf duty">
+        <div class="photo-slot" data-file="105_surf-duty.jpg">
+          <img src="photos/105_surf-duty.jpg" onerror="this.parentElement.classList.add('missing')" alt="Surf Duty">
+          <div class="missing-label">105_surf-duty.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Surf Duty</div>
+          <div class="card-num">105</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="corvette stingray">
+        <div class="photo-slot" data-file="109_corvette-stingray.jpg">
+          <img src="photos/109_corvette-stingray.jpg" onerror="this.parentElement.classList.add('missing')" alt="Corvette Stingray">
+          <div class="missing-label">109_corvette-stingray.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Corvette Stingray</div>
+          <div class="card-num">109</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="silverado ev rst">
+        <div class="photo-slot" data-file="110_silverado-ev-rst.jpg">
+          <img src="photos/110_silverado-ev-rst.jpg" onerror="this.parentElement.classList.add('missing')" alt="Silverado EV RST">
+          <div class="missing-label">110_silverado-ev-rst.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Silverado EV RST</div>
+          <div class="card-num">110</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="pontiac aztek custom">
+        <div class="photo-slot" data-file="111_pontiac-aztek-custom.jpg">
+          <img src="photos/111_pontiac-aztek-custom.jpg" onerror="this.parentElement.classList.add('missing')" alt="Pontiac Aztek Custom">
+          <div class="missing-label">111_pontiac-aztek-custom.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Pontiac Aztek Custom</div>
+          <div class="card-num">111</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mustang funny car">
+        <div class="photo-slot" data-file="112_mustang-funny-car.jpg">
+          <img src="photos/112_mustang-funny-car.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mustang Funny Car">
+          <div class="missing-label">112_mustang-funny-car.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mustang Funny Car</div>
+          <div class="card-num">112</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="layin' lowrider">
+        <div class="photo-slot" data-file="113_layin-lowrider.jpg">
+          <img src="photos/113_layin-lowrider.jpg" onerror="this.parentElement.classList.add('missing')" alt="Layin' Lowrider">
+          <div class="missing-label">113_layin-lowrider.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Layin' Lowrider</div>
+          <div class="card-num">113</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="t-rextroyer">
+        <div class="photo-slot" data-file="114_t-rextroyer.jpg">
+          <img src="photos/114_t-rextroyer.jpg" onerror="this.parentElement.classList.add('missing')" alt="T-Rextroyer">
+          <div class="missing-label">114_t-rextroyer.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">T-Rextroyer</div>
+          <div class="card-num">114</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="15 jaguar f-type project 7">
+        <div class="photo-slot" data-file="116_15-jaguar-ftype-project-7.jpg">
+          <img src="photos/116_15-jaguar-ftype-project-7.jpg" onerror="this.parentElement.classList.add('missing')" alt="15 Jaguar F-Type Project 7">
+          <div class="missing-label">116_15-jaguar-ftype-project-7.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">15 Jaguar F-Type Project 7</div>
+          <div class="card-num">116</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="tanknator">
+        <div class="photo-slot" data-file="119_tanknator.jpg">
+          <img src="photos/119_tanknator.jpg" onerror="this.parentElement.classList.add('missing')" alt="Tanknator">
+          <div class="missing-label">119_tanknator.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Tanknator</div>
+          <div class="card-num">119</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="cadillac project gtp hypercar">
+        <div class="photo-slot" data-file="123_cadillac-project-gtp-hypercar.jpg">
+          <img src="photos/123_cadillac-project-gtp-hypercar.jpg" onerror="this.parentElement.classList.add('missing')" alt="Cadillac Project GTP Hypercar">
+          <div class="missing-label">123_cadillac-project-gtp-hypercar.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Cadillac Project GTP Hypercar</div>
+          <div class="card-num">123</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="5 alarm">
+        <div class="photo-slot" data-file="125_5-alarm.jpg">
+          <img src="photos/125_5-alarm.jpg" onerror="this.parentElement.classList.add('missing')" alt="5 Alarm">
+          <div class="missing-label">125_5-alarm.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">5 Alarm</div>
+          <div class="card-num">125</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="ford performance supervan 4">
+        <div class="photo-slot" data-file="128_ford-performance-supervan-4.jpg">
+          <img src="photos/128_ford-performance-supervan-4.jpg" onerror="this.parentElement.classList.add('missing')" alt="Ford Performance Supervan 4">
+          <div class="missing-label">128_ford-performance-supervan-4.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Ford Performance Supervan 4</div>
+          <div class="card-num">128</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 911 carrera">
+        <div class="photo-slot" data-file="134_porsche-911-carrera-keychain.jpg">
+          <img src="photos/134_porsche-911-carrera-keychain.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 911 Carrera">
+          <div class="missing-label">134_porsche-911-carrera-keychain.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 911 Carrera</div>
+          <div class="card-num">134</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="rapid pulse">
+        <div class="photo-slot" data-file="137_rapid-pulse.jpg">
+          <img src="photos/137_rapid-pulse.jpg" onerror="this.parentElement.classList.add('missing')" alt="Rapid Pulse">
+          <div class="missing-label">137_rapid-pulse.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Rapid Pulse</div>
+          <div class="card-num">137</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="bmw m3 wagon">
+        <div class="photo-slot" data-file="138_bmw-m3-wagon.jpg">
+          <img src="photos/138_bmw-m3-wagon.jpg" onerror="this.parentElement.classList.add('missing')" alt="BMW M3 Wagon">
+          <div class="missing-label">138_bmw-m3-wagon.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">BMW M3 Wagon</div>
+          <div class="card-num">138</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="hirohata merc">
+        <div class="photo-slot" data-file="143_hirohata-merc.jpg">
+          <img src="photos/143_hirohata-merc.jpg" onerror="this.parentElement.classList.add('missing')" alt="Hirohata Merc">
+          <div class="missing-label">143_hirohata-merc.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Hirohata Merc</div>
+          <div class="card-num">143</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mazda 787b">
+        <div class="photo-slot" data-file="145_mazda-787b.jpg">
+          <img src="photos/145_mazda-787b.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mazda 787B">
+          <div class="missing-label">145_mazda-787b.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mazda 787B</div>
+          <div class="card-num">145</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="birthday burner">
+        <div class="photo-slot" data-file="146_birthday-burner.jpg">
+          <img src="photos/146_birthday-burner.jpg" onerror="this.parentElement.classList.add('missing')" alt="Birthday Burner">
+          <div class="missing-label">146_birthday-burner.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Birthday Burner</div>
+          <div class="card-num">146</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="speed dozer">
+        <div class="photo-slot" data-file="147_speed-dozer.jpg">
+          <img src="photos/147_speed-dozer.jpg" onerror="this.parentElement.classList.add('missing')" alt="Speed Dozer">
+          <div class="missing-label">147_speed-dozer.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Speed Dozer</div>
+          <div class="card-num">147</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="batman arkham knight batmobile">
+        <div class="photo-slot" data-file="149_batman-arkham-knight-batmobile.jpg">
+          <img src="photos/149_batman-arkham-knight-batmobile.jpg" onerror="this.parentElement.classList.add('missing')" alt="Batman Arkham Knight Batmobile">
+          <div class="missing-label">149_batman-arkham-knight-batmobile.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Batman Arkham Knight Batmobile</div>
+          <div class="card-num">149</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="donut drifter">
+        <div class="photo-slot" data-file="150_donut-drifter.jpg">
+          <img src="photos/150_donut-drifter.jpg" onerror="this.parentElement.classList.add('missing')" alt="Donut Drifter">
+          <div class="missing-label">150_donut-drifter.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Donut Drifter</div>
+          <div class="card-num">150</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="king kuda">
+        <div class="photo-slot" data-file="152_king-kuda.jpg">
+          <img src="photos/152_king-kuda.jpg" onerror="this.parentElement.classList.add('missing')" alt="King Kuda">
+          <div class="missing-label">152_king-kuda.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">King Kuda</div>
+          <div class="card-num">152</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="volvo p1800 gasser">
+        <div class="photo-slot" data-file="153_volvo-p1800-gasser.jpg">
+          <img src="photos/153_volvo-p1800-gasser.jpg" onerror="this.parentElement.classList.add('missing')" alt="Volvo P1800 Gasser">
+          <div class="missing-label">153_volvo-p1800-gasser.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Volvo P1800 Gasser</div>
+          <div class="card-num">153</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="63 studebaker champ">
+        <div class="photo-slot" data-file="155_63-studebaker-champ.jpg">
+          <img src="photos/155_63-studebaker-champ.jpg" onerror="this.parentElement.classList.add('missing')" alt="63 Studebaker Champ">
+          <div class="missing-label">155_63-studebaker-champ.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">63 Studebaker Champ</div>
+          <div class="card-num">155</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mazda rx-3">
+        <div class="photo-slot" data-file="156_mazda-rx3.jpg">
+          <img src="photos/156_mazda-rx3.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mazda RX-3">
+          <div class="missing-label">156_mazda-rx3.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mazda RX-3</div>
+          <div class="card-num">156</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="64 chevy chevelle ss (red)">
+        <div class="photo-slot" data-file="157_64-chevy-chevelle-ss-red.jpg">
+          <img src="photos/157_64-chevy-chevelle-ss-red.jpg" onerror="this.parentElement.classList.add('missing')" alt="64 Chevy Chevelle SS (Red)">
+          <div class="missing-label">157_64-chevy-chevelle-ss-red.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">64 Chevy Chevelle SS (Red)</div>
+          <div class="card-num">157</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="64 chevy chevelle ss (cream white)">
+        <div class="photo-slot" data-file="157_64-chevy-chevelle-ss-cream.jpg">
+          <img src="photos/157_64-chevy-chevelle-ss-cream.jpg" onerror="this.parentElement.classList.add('missing')" alt="64 Chevy Chevelle SS (Cream White)">
+          <div class="missing-label">157_64-chevy-chevelle-ss-cream.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">64 Chevy Chevelle SS (Cream White)</div>
+          <div class="card-num">157</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 904 carrera gts (red)">
+        <div class="photo-slot" data-file="158_porsche-904-carrera-gts-red.jpg">
+          <img src="photos/158_porsche-904-carrera-gts-red.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 904 Carrera GTS (Red)">
+          <div class="missing-label">158_porsche-904-carrera-gts-red.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 904 Carrera GTS (Red)</div>
+          <div class="card-num">158</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 904 carrera gts (silver)">
+        <div class="photo-slot" data-file="158_porsche-904-carrera-gts-silver.jpg">
+          <img src="photos/158_porsche-904-carrera-gts-silver.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 904 Carrera GTS (Silver)">
+          <div class="missing-label">158_porsche-904-carrera-gts-silver.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 904 Carrera GTS (Silver)</div>
+          <div class="card-num">158</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="fnf 70 dodge charger">
+        <div class="photo-slot" data-file="159_fnf-70-dodge-charger.jpg">
+          <img src="photos/159_fnf-70-dodge-charger.jpg" onerror="this.parentElement.classList.add('missing')" alt="FnF 70 Dodge Charger">
+          <div class="missing-label">159_fnf-70-dodge-charger.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">FnF 70 Dodge Charger</div>
+          <div class="card-num">159</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="speed bump">
+        <div class="photo-slot" data-file="163_speed-bump.jpg">
+          <img src="photos/163_speed-bump.jpg" onerror="this.parentElement.classList.add('missing')" alt="Speed Bump">
+          <div class="missing-label">163_speed-bump.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Speed Bump</div>
+          <div class="card-num">163</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mailed it!">
+        <div class="photo-slot" data-file="164_mailed-it.jpg">
+          <img src="photos/164_mailed-it.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mailed It!">
+          <div class="missing-label">164_mailed-it.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mailed It!</div>
+          <div class="card-num">164</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mclaren p1">
+        <div class="photo-slot" data-file="164_mclaren-p1.jpg">
+          <img src="photos/164_mclaren-p1.jpg" onerror="this.parentElement.classList.add('missing')" alt="McLaren P1">
+          <div class="missing-label">164_mclaren-p1.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">McLaren P1</div>
+          <div class="card-num">164</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="later crater">
+        <div class="photo-slot" data-file="166_later-crater.jpg">
+          <img src="photos/166_later-crater.jpg" onerror="this.parentElement.classList.add('missing')" alt="Later Crater">
+          <div class="missing-label">166_later-crater.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Later Crater</div>
+          <div class="card-num">166</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mitsubishi pajero evolution">
+        <div class="photo-slot" data-file="169_mitsubishi-pajero-evolution.jpg">
+          <img src="photos/169_mitsubishi-pajero-evolution.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mitsubishi Pajero Evolution">
+          <div class="missing-label">169_mitsubishi-pajero-evolution.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mitsubishi Pajero Evolution</div>
+          <div class="card-num">169</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="95 mazda rx-7">
+        <div class="photo-slot" data-file="170_95-mazda-rx7.jpg">
+          <img src="photos/170_95-mazda-rx7.jpg" onerror="this.parentElement.classList.add('missing')" alt="95 Mazda RX-7">
+          <div class="missing-label">170_95-mazda-rx7.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">95 Mazda RX-7</div>
+          <div class="card-num">170</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="69 mercury cougar eliminator">
+        <div class="photo-slot" data-file="171_69-mercury-cougar-eliminator.jpg">
+          <img src="photos/171_69-mercury-cougar-eliminator.jpg" onerror="this.parentElement.classList.add('missing')" alt="69 Mercury Cougar Eliminator">
+          <div class="missing-label">171_69-mercury-cougar-eliminator.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">69 Mercury Cougar Eliminator</div>
+          <div class="card-num">171</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 911 rallye">
+        <div class="photo-slot" data-file="172_porsche-911-rallye.jpg">
+          <img src="photos/172_porsche-911-rallye.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 911 Rallye">
+          <div class="missing-label">172_porsche-911-rallye.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 911 Rallye</div>
+          <div class="card-num">172</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="96 porsche carrera (blue)">
+        <div class="photo-slot" data-file="174_96-porsche-carrera-blue.jpg">
+          <img src="photos/174_96-porsche-carrera-blue.jpg" onerror="this.parentElement.classList.add('missing')" alt="96 Porsche Carrera (Blue)">
+          <div class="missing-label">174_96-porsche-carrera-blue.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">96 Porsche Carrera (Blue)</div>
+          <div class="card-num">174</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="96 porsche carrera (white)">
+        <div class="photo-slot" data-file="174_96-porsche-carrera-white.jpg">
+          <img src="photos/174_96-porsche-carrera-white.jpg" onerror="this.parentElement.classList.add('missing')" alt="96 Porsche Carrera (White)">
+          <div class="missing-label">174_96-porsche-carrera-white.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">96 Porsche Carrera (White)</div>
+          <div class="card-num">174</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="90 acura nsx">
+        <div class="photo-slot" data-file="175_90-acura-nsx.jpg">
+          <img src="photos/175_90-acura-nsx.jpg" onerror="this.parentElement.classList.add('missing')" alt="90 Acura NSX">
+          <div class="missing-label">175_90-acura-nsx.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">90 Acura NSX</div>
+          <div class="card-num">175</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="dragtor">
+        <div class="photo-slot" data-file="176_dragtor.jpg">
+          <img src="photos/176_dragtor.jpg" onerror="this.parentElement.classList.add('missing')" alt="Dragtor">
+          <div class="missing-label">176_dragtor.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Dragtor</div>
+          <div class="card-num">176</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="batman: the animated series (black)">
+        <div class="photo-slot" data-file="177_batman-animated-black.jpg">
+          <img src="photos/177_batman-animated-black.jpg" onerror="this.parentElement.classList.add('missing')" alt="Batman: The Animated Series (Black)">
+          <div class="missing-label">177_batman-animated-black.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Batman: The Animated Series (Black)</div>
+          <div class="card-num">177</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="shelby cobra 427 s/c">
+        <div class="photo-slot" data-file="181_shelby-cobra-427-sc.jpg">
+          <img src="photos/181_shelby-cobra-427-sc.jpg" onerror="this.parentElement.classList.add('missing')" alt="Shelby Cobra 427 S/C">
+          <div class="missing-label">181_shelby-cobra-427-sc.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Shelby Cobra 427 S/C</div>
+          <div class="card-num">181</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="chrysler pacifica">
+        <div class="photo-slot" data-file="182_chrysler-pacifica.jpg">
+          <img src="photos/182_chrysler-pacifica.jpg" onerror="this.parentElement.classList.add('missing')" alt="Chrysler Pacifica">
+          <div class="missing-label">182_chrysler-pacifica.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Chrysler Pacifica</div>
+          <div class="card-num">182</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="2020 koenigsegg jesko">
+        <div class="photo-slot" data-file="184_2020-koenigsegg-jesko.jpg">
+          <img src="photos/184_2020-koenigsegg-jesko.jpg" onerror="this.parentElement.classList.add('missing')" alt="2020 Koenigsegg Jesko">
+          <div class="missing-label">184_2020-koenigsegg-jesko.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">2020 Koenigsegg Jesko</div>
+          <div class="card-num">184</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="bugatti bolide">
+        <div class="photo-slot" data-file="185_bugatti-bolide.jpg">
+          <img src="photos/185_bugatti-bolide.jpg" onerror="this.parentElement.classList.add('missing')" alt="Bugatti Bolide">
+          <div class="missing-label">185_bugatti-bolide.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Bugatti Bolide</div>
+          <div class="card-num">185</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="bumblebee">
+        <div class="photo-slot" data-file="186_bumblebee.jpg">
+          <img src="photos/186_bumblebee.jpg" onerror="this.parentElement.classList.add('missing')" alt="Bumblebee">
+          <div class="missing-label">186_bumblebee.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Bumblebee</div>
+          <div class="card-num">186</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="67 lotus type 49">
+        <div class="photo-slot" data-file="188_67-lotus-type-49.jpg">
+          <img src="photos/188_67-lotus-type-49.jpg" onerror="this.parentElement.classList.add('missing')" alt="67 Lotus Type 49">
+          <div class="missing-label">188_67-lotus-type-49.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">67 Lotus Type 49</div>
+          <div class="card-num">188</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="nissan skyline 2000gt-r lbwk">
+        <div class="photo-slot" data-file="191_nissan-skyline-2000gtr-lbwk.jpg">
+          <img src="photos/191_nissan-skyline-2000gtr-lbwk.jpg" onerror="this.parentElement.classList.add('missing')" alt="Nissan Skyline 2000GT-R LBWK">
+          <div class="missing-label">191_nissan-skyline-2000gtr-lbwk.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Nissan Skyline 2000GT-R LBWK</div>
+          <div class="card-num">191</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="86 mustang svo">
+        <div class="photo-slot" data-file="192_86-mustang-svo.jpg">
+          <img src="photos/192_86-mustang-svo.jpg" onerror="this.parentElement.classList.add('missing')" alt="86 Mustang SVO">
+          <div class="missing-label">192_86-mustang-svo.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">86 Mustang SVO</div>
+          <div class="card-num">192</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="formula e gen3">
+        <div class="photo-slot" data-file="193_formula-e-gen3.jpg">
+          <img src="photos/193_formula-e-gen3.jpg" onerror="this.parentElement.classList.add('missing')" alt="Formula E Gen3">
+          <div class="missing-label">193_formula-e-gen3.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Formula E Gen3</div>
+          <div class="card-num">193</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="22 ford maverick custom">
+        <div class="photo-slot" data-file="196_22-ford-maverick-custom.jpg">
+          <img src="photos/196_22-ford-maverick-custom.jpg" onerror="this.parentElement.classList.add('missing')" alt="22 Ford Maverick Custom">
+          <div class="missing-label">196_22-ford-maverick-custom.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">22 Ford Maverick Custom</div>
+          <div class="card-num">196</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="20 toyota tacoma">
+        <div class="photo-slot" data-file="198_20-toyota-tacoma.jpg">
+          <img src="photos/198_20-toyota-tacoma.jpg" onerror="this.parentElement.classList.add('missing')" alt="20 Toyota Tacoma">
+          <div class="missing-label">198_20-toyota-tacoma.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">20 Toyota Tacoma</div>
+          <div class="card-num">198</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 911 turbo 3.6 (964)">
+        <div class="photo-slot" data-file="199_porsche-911-turbo-36-964.jpg">
+          <img src="photos/199_porsche-911-turbo-36-964.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 911 Turbo 3.6 (964)">
+          <div class="missing-label">199_porsche-911-turbo-36-964.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 911 Turbo 3.6 (964)</div>
+          <div class="card-num">199</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="car-de-asada">
+        <div class="photo-slot" data-file="200_car-de-asada-th.jpg">
+          <img src="photos/200_car-de-asada-th.jpg" onerror="this.parentElement.classList.add('missing')" alt="Car-de-asada">
+          <div class="missing-label">200_car-de-asada-th.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Car-de-asada</div>
+          <div class="card-num">200</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="volkswagen id buzz">
+        <div class="photo-slot" data-file="202_volkswagen-id-buzz.jpg">
+          <img src="photos/202_volkswagen-id-buzz.jpg" onerror="this.parentElement.classList.add('missing')" alt="Volkswagen ID Buzz">
+          <div class="missing-label">202_volkswagen-id-buzz.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Volkswagen ID Buzz</div>
+          <div class="card-num">202</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="lamborghini sesto elemento">
+        <div class="photo-slot" data-file="204_lamborghini-sesto-elemento.jpg">
+          <img src="photos/204_lamborghini-sesto-elemento.jpg" onerror="this.parentElement.classList.add('missing')" alt="Lamborghini Sesto Elemento">
+          <div class="missing-label">204_lamborghini-sesto-elemento.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Lamborghini Sesto Elemento</div>
+          <div class="card-num">204</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="pagani utopia">
+        <div class="photo-slot" data-file="205_pagani-utopia.jpg">
+          <img src="photos/205_pagani-utopia.jpg" onerror="this.parentElement.classList.add('missing')" alt="Pagani Utopia">
+          <div class="missing-label">205_pagani-utopia.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Pagani Utopia</div>
+          <div class="card-num">205</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="honda s800 racing">
+        <div class="photo-slot" data-file="209_honda-s800-racing.jpg">
+          <img src="photos/209_honda-s800-racing.jpg" onerror="this.parentElement.classList.add('missing')" alt="Honda S800 Racing">
+          <div class="missing-label">209_honda-s800-racing.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Honda S800 Racing</div>
+          <div class="card-num">209</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="99 ford f-150 svt lightning">
+        <div class="photo-slot" data-file="210_99-ford-f150-svt-lightning.jpg">
+          <img src="photos/210_99-ford-f150-svt-lightning.jpg" onerror="this.parentElement.classList.add('missing')" alt="99 Ford F-150 SVT Lightning">
+          <div class="missing-label">210_99-ford-f150-svt-lightning.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">99 Ford F-150 SVT Lightning</div>
+          <div class="card-num">210</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="96 nissan 180sx type x">
+        <div class="photo-slot" data-file="211_96-nissan-180sx-type-x.jpg">
+          <img src="photos/211_96-nissan-180sx-type-x.jpg" onerror="this.parentElement.classList.add('missing')" alt="96 Nissan 180SX Type X">
+          <div class="missing-label">211_96-nissan-180sx-type-x.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">96 Nissan 180SX Type X</div>
+          <div class="card-num">211</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="dune daddy">
+        <div class="photo-slot" data-file="212_dune-daddy.jpg">
+          <img src="photos/212_dune-daddy.jpg" onerror="this.parentElement.classList.add('missing')" alt="Dune Daddy">
+          <div class="missing-label">212_dune-daddy.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Dune Daddy</div>
+          <div class="card-num">212</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="nissan skyline 2000gt-r lbwk">
+        <div class="photo-slot" data-file="213_nissan-skyline-2000gtr-lbwk-tooned.jpg">
+          <img src="photos/213_nissan-skyline-2000gtr-lbwk-tooned.jpg" onerror="this.parentElement.classList.add('missing')" alt="Nissan Skyline 2000GT-R LBWK">
+          <div class="missing-label">213_nissan-skyline-2000gtr-lbwk-tooned.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Nissan Skyline 2000GT-R LBWK</div>
+          <div class="card-num">213</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="quick bite">
+        <div class="photo-slot" data-file="214_quick-bite.jpg">
+          <img src="photos/214_quick-bite.jpg" onerror="this.parentElement.classList.add('missing')" alt="Quick Bite">
+          <div class="missing-label">214_quick-bite.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Quick Bite</div>
+          <div class="card-num">214</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="49 drag merc">
+        <div class="photo-slot" data-file="215_49-drag-merc.jpg">
+          <img src="photos/215_49-drag-merc.jpg" onerror="this.parentElement.classList.add('missing')" alt="49 Drag Merc">
+          <div class="missing-label">215_49-drag-merc.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">49 Drag Merc</div>
+          <div class="card-num">215</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="ravenger s/t">
+        <div class="photo-slot" data-file="217_ravenger-st.jpg">
+          <img src="photos/217_ravenger-st.jpg" onerror="this.parentElement.classList.add('missing')" alt="Ravenger S/T">
+          <div class="missing-label">217_ravenger-st.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Ravenger S/T</div>
+          <div class="card-num">217</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="92 dodge viper rt/10">
+        <div class="photo-slot" data-file="218_92-dodge-viper-rt10.jpg">
+          <img src="photos/218_92-dodge-viper-rt10.jpg" onerror="this.parentElement.classList.add('missing')" alt="92 Dodge Viper RT/10">
+          <div class="missing-label">218_92-dodge-viper-rt10.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">92 Dodge Viper RT/10</div>
+          <div class="card-num">218</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="aston martin db4gt high-speed edition">
+        <div class="photo-slot" data-file="219_aston-martin-db4gt-hse.jpg">
+          <img src="photos/219_aston-martin-db4gt-hse.jpg" onerror="this.parentElement.classList.add('missing')" alt="Aston Martin DB4GT High-Speed Edition">
+          <div class="missing-label">219_aston-martin-db4gt-hse.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Aston Martin DB4GT High-Speed Edition</div>
+          <div class="card-num">219</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="67 ford gt40 mk.iv">
+        <div class="photo-slot" data-file="220_67-ford-gt40-mkiv.jpg">
+          <img src="photos/220_67-ford-gt40-mkiv.jpg" onerror="this.parentElement.classList.add('missing')" alt="67 Ford GT40 Mk.IV">
+          <div class="missing-label">220_67-ford-gt40-mkiv.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">67 Ford GT40 Mk.IV</div>
+          <div class="card-num">220</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="deora iii">
+        <div class="photo-slot" data-file="221_deora-iii.jpg">
+          <img src="photos/221_deora-iii.jpg" onerror="this.parentElement.classList.add('missing')" alt="Deora III">
+          <div class="missing-label">221_deora-iii.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Deora III</div>
+          <div class="card-num">221</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="lamborghini huracan sterrato">
+        <div class="photo-slot" data-file="222_lamborghini-huracan-sterrato.jpg">
+          <img src="photos/222_lamborghini-huracan-sterrato.jpg" onerror="this.parentElement.classList.add('missing')" alt="Lamborghini Huracan Sterrato">
+          <div class="missing-label">222_lamborghini-huracan-sterrato.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Lamborghini Huracan Sterrato</div>
+          <div class="card-num">222</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="hover storm">
+        <div class="photo-slot" data-file="223_hover-storm.jpg">
+          <img src="photos/223_hover-storm.jpg" onerror="this.parentElement.classList.add('missing')" alt="Hover Storm">
+          <div class="missing-label">223_hover-storm.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Hover Storm</div>
+          <div class="card-num">223</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="fnf toyota supra">
+        <div class="photo-slot" data-file="224_fnf-toyota-supra-tooned.jpg">
+          <img src="photos/224_fnf-toyota-supra-tooned.jpg" onerror="this.parentElement.classList.add('missing')" alt="FnF Toyota Supra">
+          <div class="missing-label">224_fnf-toyota-supra-tooned.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">FnF Toyota Supra</div>
+          <div class="card-num">224</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="sushi tuner">
+        <div class="photo-slot" data-file="225_sushi-tuner.jpg">
+          <img src="photos/225_sushi-tuner.jpg" onerror="this.parentElement.classList.add('missing')" alt="Sushi Tuner">
+          <div class="missing-label">225_sushi-tuner.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Sushi Tuner</div>
+          <div class="card-num">225</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="vw t3 custom">
+        <div class="photo-slot" data-file="227_vw-t3-custom.jpg">
+          <img src="photos/227_vw-t3-custom.jpg" onerror="this.parentElement.classList.add('missing')" alt="VW T3 Custom">
+          <div class="missing-label">227_vw-t3-custom.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">VW T3 Custom</div>
+          <div class="card-num">227</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="small bloc">
+        <div class="photo-slot" data-file="228_small-bloc.jpg">
+          <img src="photos/228_small-bloc.jpg" onerror="this.parentElement.classList.add('missing')" alt="Small Bloc">
+          <div class="missing-label">228_small-bloc.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Small Bloc</div>
+          <div class="card-num">228</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="2016 ford gt race">
+        <div class="photo-slot" data-file="229_2016-ford-gt-race.jpg">
+          <img src="photos/229_2016-ford-gt-race.jpg" onerror="this.parentElement.classList.add('missing')" alt="2016 Ford GT Race">
+          <div class="missing-label">229_2016-ford-gt-race.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">2016 Ford GT Race</div>
+          <div class="card-num">229</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="59 chevy impala">
+        <div class="photo-slot" data-file="230_59-chevy-impala-th.jpg">
+          <img src="photos/230_59-chevy-impala-th.jpg" onerror="this.parentElement.classList.add('missing')" alt="59 Chevy Impala">
+          <div class="missing-label">230_59-chevy-impala-th.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">59 Chevy Impala</div>
+          <div class="card-num">230</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="toyota supra">
+        <div class="photo-slot" data-file="232_toyota-supra.jpg">
+          <img src="photos/232_toyota-supra.jpg" onerror="this.parentElement.classList.add('missing')" alt="Toyota Supra">
+          <div class="missing-label">232_toyota-supra.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Toyota Supra</div>
+          <div class="card-num">232</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="hw roll cage">
+        <div class="photo-slot" data-file="233_hw-roll-cage.jpg">
+          <img src="photos/233_hw-roll-cage.jpg" onerror="this.parentElement.classList.add('missing')" alt="HW Roll Cage">
+          <div class="missing-label">233_hw-roll-cage.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">HW Roll Cage</div>
+          <div class="card-num">233</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="gordon murray automotive t.50s">
+        <div class="photo-slot" data-file="234_gordon-murray-t50s.jpg">
+          <img src="photos/234_gordon-murray-t50s.jpg" onerror="this.parentElement.classList.add('missing')" alt="Gordon Murray Automotive T.50s">
+          <div class="missing-label">234_gordon-murray-t50s.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Gordon Murray Automotive T.50s</div>
+          <div class="card-num">234</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="dmc delorean">
+        <div class="photo-slot" data-file="236_dmc-delorean.jpg">
+          <img src="photos/236_dmc-delorean.jpg" onerror="this.parentElement.classList.add('missing')" alt="DMC DeLorean">
+          <div class="missing-label">236_dmc-delorean.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">DMC DeLorean</div>
+          <div class="card-num">236</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="tesla model s plaid">
+        <div class="photo-slot" data-file="238_tesla-model-s-plaid.jpg">
+          <img src="photos/238_tesla-model-s-plaid.jpg" onerror="this.parentElement.classList.add('missing')" alt="Tesla Model S Plaid">
+          <div class="missing-label">238_tesla-model-s-plaid.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Tesla Model S Plaid</div>
+          <div class="card-num">238</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="lamborghini huracan lp 620-2 super trofeo">
+        <div class="photo-slot" data-file="239_lamborghini-huracan-lp620-2-super-trofeo.jpg">
+          <img src="photos/239_lamborghini-huracan-lp620-2-super-trofeo.jpg" onerror="this.parentElement.classList.add('missing')" alt="Lamborghini Huracan LP 620-2 Super Trofeo">
+          <div class="missing-label">239_lamborghini-huracan-lp620-2-super-trofeo.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Lamborghini Huracan LP 620-2 Super Trofeo</div>
+          <div class="card-num">239</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="17 ford gt">
+        <div class="photo-slot" data-file="240_17-ford-gt.jpg">
+          <img src="photos/240_17-ford-gt.jpg" onerror="this.parentElement.classList.add('missing')" alt="17 Ford GT">
+          <div class="missing-label">240_17-ford-gt.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">17 Ford GT</div>
+          <div class="card-num">240</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="dodge viper srt10 acr">
+        <div class="photo-slot" data-file="241_dodge-viper-srt10-acr.jpg">
+          <img src="photos/241_dodge-viper-srt10-acr.jpg" onerror="this.parentElement.classList.add('missing')" alt="Dodge Viper SRT10 ACR">
+          <div class="missing-label">241_dodge-viper-srt10-acr.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Dodge Viper SRT10 ACR</div>
+          <div class="card-num">241</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="lb-silhouette works gt nissan 35gt-rr ver.2">
+        <div class="photo-slot" data-file="242_lb-silhouette-works-gt-nissan-35gtrr-v2.jpg">
+          <img src="photos/242_lb-silhouette-works-gt-nissan-35gtrr-v2.jpg" onerror="this.parentElement.classList.add('missing')" alt="LB-Silhouette Works GT Nissan 35GT-RR Ver.2">
+          <div class="missing-label">242_lb-silhouette-works-gt-nissan-35gtrr-v2.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">LB-Silhouette Works GT Nissan 35GT-RR Ver.2</div>
+          <div class="card-num">242</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mclaren f1">
+        <div class="photo-slot" data-file="243_mclaren-f1.jpg">
+          <img src="photos/243_mclaren-f1.jpg" onerror="this.parentElement.classList.add('missing')" alt="McLaren F1">
+          <div class="missing-label">243_mclaren-f1.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">McLaren F1</div>
+          <div class="card-num">243</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="98 subaru impreza 22b-sti">
+        <div class="photo-slot" data-file="244_98-subaru-impreza-22b-sti.jpg">
+          <img src="photos/244_98-subaru-impreza-22b-sti.jpg" onerror="this.parentElement.classList.add('missing')" alt="98 Subaru Impreza 22B-STi">
+          <div class="missing-label">244_98-subaru-impreza-22b-sti.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">98 Subaru Impreza 22B-STi</div>
+          <div class="card-num">244</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="hi-roller ii">
+        <div class="photo-slot" data-file="247_hi-roller-ii.jpg">
+          <img src="photos/247_hi-roller-ii.jpg" onerror="this.parentElement.classList.add('missing')" alt="Hi-Roller II">
+          <div class="missing-label">247_hi-roller-ii.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Hi-Roller II</div>
+          <div class="card-num">247</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="dodge van">
+        <div class="photo-slot" data-file="248_dodge-van.jpg">
+          <img src="photos/248_dodge-van.jpg" onerror="this.parentElement.classList.add('missing')" alt="Dodge Van">
+          <div class="missing-label">248_dodge-van.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Dodge Van</div>
+          <div class="card-num">248</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="ford mustang dark horse">
+        <div class="photo-slot" data-file="250_ford-mustang-dark-horse.jpg">
+          <img src="photos/250_ford-mustang-dark-horse.jpg" onerror="this.parentElement.classList.add('missing')" alt="Ford Mustang Dark Horse">
+          <div class="missing-label">250_ford-mustang-dark-horse.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Ford Mustang Dark Horse</div>
+          <div class="card-num">250</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s1">
+      <div class="series-head">
+        <h2>HOT WHEELS 2023</h2>
+        <span class="series-count">13 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="custom small block">
+        <div class="photo-slot" data-file="custom-small-block.jpg">
+          <img src="photos/custom-small-block.jpg" onerror="this.parentElement.classList.add('missing')" alt="Custom Small Block">
+          <div class="missing-label">custom-small-block.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Custom Small Block</div>
+          <div class="card-num">30/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="dodge charger drift">
+        <div class="photo-slot" data-file="dodge-charger-drift.jpg">
+          <img src="photos/dodge-charger-drift.jpg" onerror="this.parentElement.classList.add('missing')" alt="Dodge Charger Drift">
+          <div class="missing-label">dodge-charger-drift.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Dodge Charger Drift</div>
+          <div class="card-num">54/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="71 plymouth gtx">
+        <div class="photo-slot" data-file="71-plymouth-gtx.jpg">
+          <img src="photos/71-plymouth-gtx.jpg" onerror="this.parentElement.classList.add('missing')" alt="71 Plymouth GTX">
+          <div class="missing-label">71-plymouth-gtx.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">71 Plymouth GTX</div>
+          <div class="card-num">166/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mad splash">
+        <div class="photo-slot" data-file="mad-splash.jpg">
+          <img src="photos/mad-splash.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mad Splash">
+          <div class="missing-label">mad-splash.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mad Splash</div>
+          <div class="card-num">168/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="batman: the animated series (yellow)">
+        <div class="photo-slot" data-file="batman-the-animated-series-yellow.jpg">
+          <img src="photos/batman-the-animated-series-yellow.jpg" onerror="this.parentElement.classList.add('missing')" alt="Batman: The Animated Series (Yellow)">
+          <div class="missing-label">batman-the-animated-series-yellow.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Batman: The Animated Series (Yellow)</div>
+          <div class="card-num">169/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="tooned twinmill">
+        <div class="photo-slot" data-file="tooned-twinmill.jpg">
+          <img src="photos/tooned-twinmill.jpg" onerror="this.parentElement.classList.add('missing')" alt="Tooned Twinmill">
+          <div class="missing-label">tooned-twinmill.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Tooned Twinmill</div>
+          <div class="card-num">170/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="rockin' railer">
+        <div class="photo-slot" data-file="rockin-railer.jpg">
+          <img src="photos/rockin-railer.jpg" onerror="this.parentElement.classList.add('missing')" alt="Rockin' Railer">
+          <div class="missing-label">rockin-railer.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Rockin' Railer</div>
+          <div class="card-num">171/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mitsubishi pajero evolution">
+        <div class="photo-slot" data-file="mitsubishi-pajero-evolution.jpg">
+          <img src="photos/mitsubishi-pajero-evolution.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mitsubishi Pajero Evolution">
+          <div class="missing-label">mitsubishi-pajero-evolution.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mitsubishi Pajero Evolution</div>
+          <div class="card-num">175/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="dune crusher">
+        <div class="photo-slot" data-file="dune-crusher.jpg">
+          <img src="photos/dune-crusher.jpg" onerror="this.parentElement.classList.add('missing')" alt="Dune Crusher">
+          <div class="missing-label">dune-crusher.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Dune Crusher</div>
+          <div class="card-num">182/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="tesla roadster">
+        <div class="photo-slot" data-file="tesla-roadster.jpg">
+          <img src="photos/tesla-roadster.jpg" onerror="this.parentElement.classList.add('missing')" alt="Tesla Roadster">
+          <div class="missing-label">tesla-roadster.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Tesla Roadster</div>
+          <div class="card-num">217/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="sand burner">
+        <div class="photo-slot" data-file="sand-burner.jpg">
+          <img src="photos/sand-burner.jpg" onerror="this.parentElement.classList.add('missing')" alt="Sand Burner">
+          <div class="missing-label">sand-burner.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Sand Burner</div>
+          <div class="card-num">232/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="layin' lowrider">
+        <div class="photo-slot" data-file="layin-lowrider.jpg">
+          <img src="photos/layin-lowrider.jpg" onerror="this.parentElement.classList.add('missing')" alt="Layin' Lowrider">
+          <div class="missing-label">layin-lowrider.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Layin' Lowrider</div>
+          <div class="card-num">237/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="69 dodge charger 500">
+        <div class="photo-slot" data-file="69-dodge-charger-500.jpg">
+          <img src="photos/69-dodge-charger-500.jpg" onerror="this.parentElement.classList.add('missing')" alt="69 Dodge Charger 500">
+          <div class="missing-label">69-dodge-charger-500.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">69 Dodge Charger 500</div>
+          <div class="card-num">240/250</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s2">
+      <div class="series-head">
+        <h2>HOTWHEELS 2022</h2>
+        <span class="series-count">1 car</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="dodge challenger drift car mopar">
+        <div class="photo-slot" data-file="dodge-challenger-drift-car-mopar.jpg">
+          <img src="photos/dodge-challenger-drift-car-mopar.jpg" onerror="this.parentElement.classList.add('missing')" alt="Dodge Challenger Drift Car Mopar">
+          <div class="missing-label">dodge-challenger-drift-car-mopar.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Dodge Challenger Drift Car Mopar</div>
+          <div class="card-num">207/250</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s3">
+      <div class="series-head">
+        <h2>HOTWHEELS 2021</h2>
+        <span class="series-count">10 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="nissan patrol custom">
+        <div class="photo-slot" data-file="nissan-patrol-custom.jpg">
+          <img src="photos/nissan-patrol-custom.jpg" onerror="this.parentElement.classList.add('missing')" alt="Nissan Patrol Custom">
+          <div class="missing-label">nissan-patrol-custom.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Nissan Patrol Custom</div>
+          <div class="card-num">20/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="erikenstein rod">
+        <div class="photo-slot" data-file="erikenstein-rod.jpg">
+          <img src="photos/erikenstein-rod.jpg" onerror="this.parentElement.classList.add('missing')" alt="Erikenstein ROD">
+          <div class="missing-label">erikenstein-rod.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Erikenstein ROD</div>
+          <div class="card-num">86/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="turtoshell">
+        <div class="photo-slot" data-file="turtoshell.jpg">
+          <img src="photos/turtoshell.jpg" onerror="this.parentElement.classList.add('missing')" alt="Turtoshell">
+          <div class="missing-label">turtoshell.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Turtoshell</div>
+          <div class="card-num">89/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="aston martin 1963 db5">
+        <div class="photo-slot" data-file="aston-martin-1963-db5.jpg">
+          <img src="photos/aston-martin-1963-db5.jpg" onerror="this.parentElement.classList.add('missing')" alt="Aston Martin 1963 DB5">
+          <div class="missing-label">aston-martin-1963-db5.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Aston Martin 1963 DB5</div>
+          <div class="card-num">107/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="surf n turf">
+        <div class="photo-slot" data-file="surf-n-turf.jpg">
+          <img src="photos/surf-n-turf.jpg" onerror="this.parentElement.classList.add('missing')" alt="Surf n Turf">
+          <div class="missing-label">surf-n-turf.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Surf n Turf</div>
+          <div class="card-num">122/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="jaguar mk1">
+        <div class="photo-slot" data-file="jaguar-mk1.jpg">
+          <img src="photos/jaguar-mk1.jpg" onerror="this.parentElement.classList.add('missing')" alt="Jaguar MK1">
+          <div class="missing-label">jaguar-mk1.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Jaguar MK1</div>
+          <div class="card-num">127/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="gmc hummer ev">
+        <div class="photo-slot" data-file="gmc-hummer-ev.jpg">
+          <img src="photos/gmc-hummer-ev.jpg" onerror="this.parentElement.classList.add('missing')" alt="GMC Hummer EV">
+          <div class="missing-label">gmc-hummer-ev.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">GMC Hummer EV</div>
+          <div class="card-num">130/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="18 dodge challenger srt demon">
+        <div class="photo-slot" data-file="18-dodge-challenger-srt-demon.jpg">
+          <img src="photos/18-dodge-challenger-srt-demon.jpg" onerror="this.parentElement.classList.add('missing')" alt="18 Dodge Challenger SRT Demon">
+          <div class="missing-label">18-dodge-challenger-srt-demon.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">18 Dodge Challenger SRT Demon</div>
+          <div class="card-num">151/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="volkswagen baja bug (short card)">
+        <div class="photo-slot" data-file="volkswagen-baja-bug-short-card.jpg">
+          <img src="photos/volkswagen-baja-bug-short-card.jpg" onerror="this.parentElement.classList.add('missing')" alt="Volkswagen Baja Bug (Short Card)">
+          <div class="missing-label">volkswagen-baja-bug-short-card.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Volkswagen Baja Bug (Short Card)</div>
+          <div class="card-num">160/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="custom '18 ford mustang gt">
+        <div class="photo-slot" data-file="custom-18-ford-mustang-gt.jpg">
+          <img src="photos/custom-18-ford-mustang-gt.jpg" onerror="this.parentElement.classList.add('missing')" alt="Custom '18 Ford Mustang GT">
+          <div class="missing-label">custom-18-ford-mustang-gt.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Custom '18 Ford Mustang GT</div>
+          <div class="card-num">175/250</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s4">
+      <div class="series-head">
+        <h2>HOTWHEELS 2020</h2>
+        <span class="series-count">5 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="el camino">
+        <div class="photo-slot" data-file="el-camino.jpg">
+          <img src="photos/el-camino.jpg" onerror="this.parentElement.classList.add('missing')" alt="El Camino">
+          <div class="missing-label">el-camino.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">El Camino</div>
+          <div class="card-num">44/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="the batman batmobile (silver)">
+        <div class="photo-slot" data-file="the-batman-batmobile-silver.jpg">
+          <img src="photos/the-batman-batmobile-silver.jpg" onerror="this.parentElement.classList.add('missing')" alt="The Batman Batmobile (Silver)">
+          <div class="missing-label">the-batman-batmobile-silver.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">The Batman Batmobile (Silver)</div>
+          <div class="card-num">56/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="the mystery machine – hw screen time (blister case)">
+        <div class="photo-slot" data-file="the-mystery-machine-hw-screen-time-blister-case.jpg">
+          <img src="photos/the-mystery-machine-hw-screen-time-blister-case.jpg" onerror="this.parentElement.classList.add('missing')" alt="The Mystery Machine – HW Screen Time (Blister Case)">
+          <div class="missing-label">the-mystery-machine-hw-screen-time-blister-case.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">The Mystery Machine – HW Screen Time (Blister Case)</div>
+          <div class="card-num">107/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="nissan leaf nismo rc 02">
+        <div class="photo-slot" data-file="nissan-leaf-nismo-rc-02.jpg">
+          <img src="photos/nissan-leaf-nismo-rc-02.jpg" onerror="this.parentElement.classList.add('missing')" alt="Nissan Leaf Nismo RC 02">
+          <div class="missing-label">nissan-leaf-nismo-rc-02.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Nissan Leaf Nismo RC 02</div>
+          <div class="card-num">217/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="range rover classic">
+        <div class="photo-slot" data-file="range-rover-classic.jpg">
+          <img src="photos/range-rover-classic.jpg" onerror="this.parentElement.classList.add('missing')" alt="Range Rover Classic">
+          <div class="missing-label">range-rover-classic.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Range Rover Classic</div>
+          <div class="card-num">245/250</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s5">
+      <div class="series-head">
+        <h2>HOTWHEELS 2017</h2>
+        <span class="series-count">5 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="15 land rover defender double cab (zamac)">
+        <div class="photo-slot" data-file="15-land-rover-defender-double-cab-zamac.jpg">
+          <img src="photos/15-land-rover-defender-double-cab-zamac.jpg" onerror="this.parentElement.classList.add('missing')" alt="15 Land Rover Defender Double Cab (ZAMAC)">
+          <div class="missing-label">15-land-rover-defender-double-cab-zamac.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">15 Land Rover Defender Double Cab (ZAMAC)</div>
+          <div class="card-num">14/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="67 jeepster commando">
+        <div class="photo-slot" data-file="67-jeepster-commando.jpg">
+          <img src="photos/67-jeepster-commando.jpg" onerror="this.parentElement.classList.add('missing')" alt="67 Jeepster Commando">
+          <div class="missing-label">67-jeepster-commando.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">67 Jeepster Commando</div>
+          <div class="card-num">71/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="52 hudson hornet">
+        <div class="photo-slot" data-file="52-hudson-hornet.jpg">
+          <img src="photos/52-hudson-hornet.jpg" onerror="this.parentElement.classList.add('missing')" alt="52 Hudson Hornet">
+          <div class="missing-label">52-hudson-hornet.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">52 Hudson Hornet</div>
+          <div class="card-num">140/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="morris mini (blue)">
+        <div class="photo-slot" data-file="morris-mini-blue.jpg">
+          <img src="photos/morris-mini-blue.jpg" onerror="this.parentElement.classList.add('missing')" alt="Morris Mini (Blue)">
+          <div class="missing-label">morris-mini-blue.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Morris Mini (Blue)</div>
+          <div class="card-num">242/250</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="morris mini (red)">
+        <div class="photo-slot" data-file="morris-mini-red.jpg">
+          <img src="photos/morris-mini-red.jpg" onerror="this.parentElement.classList.add('missing')" alt="Morris Mini (Red)">
+          <div class="missing-label">morris-mini-red.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Morris Mini (Red)</div>
+          <div class="card-num">311/365</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s6">
+      <div class="series-head">
+        <h2>HOTWHEELS 2009</h2>
+        <span class="series-count">4 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="amc javelin amx (short card)">
+        <div class="photo-slot" data-file="amc-javelin-amx-short-card.jpg">
+          <img src="photos/amc-javelin-amx-short-card.jpg" onerror="this.parentElement.classList.add('missing')" alt="AMC Javelin AMX (Short Card)">
+          <div class="missing-label">amc-javelin-amx-short-card.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">AMC Javelin AMX (Short Card)</div>
+          <div class="card-num">1/10</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="70 chevelle ss (short card)">
+        <div class="photo-slot" data-file="70-chevelle-ss-short-card.jpg">
+          <img src="photos/70-chevelle-ss-short-card.jpg" onerror="this.parentElement.classList.add('missing')" alt="70 Chevelle SS (Short Card)">
+          <div class="missing-label">70-chevelle-ss-short-card.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">70 Chevelle SS (Short Card)</div>
+          <div class="card-num">2/10</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="custom '10 camaro ss (short card)">
+        <div class="photo-slot" data-file="custom-10-camaro-ss-short-card.jpg">
+          <img src="photos/custom-10-camaro-ss-short-card.jpg" onerror="this.parentElement.classList.add('missing')" alt="Custom '10 Camaro SS (Short Card)">
+          <div class="missing-label">custom-10-camaro-ss-short-card.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Custom '10 Camaro SS (Short Card)</div>
+          <div class="card-num">43/52</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="dodge charger drift car (short card)">
+        <div class="photo-slot" data-file="dodge-charger-drift-car-short-card.jpg">
+          <img src="photos/dodge-charger-drift-car-short-card.jpg" onerror="this.parentElement.classList.add('missing')" alt="Dodge Charger Drift Car (Short Card)">
+          <div class="missing-label">dodge-charger-drift-car-short-card.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Dodge Charger Drift Car (Short Card)</div>
+          <div class="card-num">50/52</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s7">
+      <div class="series-head">
+        <h2>HOTWHEELS 2005</h2>
+        <span class="series-count">1 car</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="dodge m80 mopar (blue card)">
+        <div class="photo-slot" data-file="dodge-m80-mopar-blue-card.jpg">
+          <img src="photos/dodge-m80-mopar-blue-card.jpg" onerror="this.parentElement.classList.add('missing')" alt="Dodge M80 Mopar (Blue Card)">
+          <div class="missing-label">dodge-m80-mopar-blue-card.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Dodge M80 Mopar (Blue Card)</div>
+          <div class="card-num">4/5</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s8">
+      <div class="series-head">
+        <h2>TRACK FLEET 2024</h2>
+        <span class="series-count">5 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="speed hauler ×2">
+        <div class="photo-slot" data-file="speed-hauler.jpg">
+          <img src="photos/speed-hauler.jpg" onerror="this.parentElement.classList.add('missing')" alt="Speed Hauler ×2">
+          <div class="missing-label">speed-hauler.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Speed Hauler ×2</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="fuel & fire">
+        <div class="photo-slot" data-file="fuel-fire.jpg">
+          <img src="photos/fuel-fire.jpg" onerror="this.parentElement.classList.add('missing')" alt="Fuel & Fire">
+          <div class="missing-label">fuel-fire.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Fuel & Fire</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="rag rider rig">
+        <div class="photo-slot" data-file="rag-rider-rig.jpg">
+          <img src="photos/rag-rider-rig.jpg" onerror="this.parentElement.classList.add('missing')" alt="Rag Rider Rig">
+          <div class="missing-label">rag-rider-rig.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Rag Rider Rig</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="volvo 240 drift camper">
+        <div class="photo-slot" data-file="volvo-240-drift-camper.jpg">
+          <img src="photos/volvo-240-drift-camper.jpg" onerror="this.parentElement.classList.add('missing')" alt="Volvo 240 Drift Camper">
+          <div class="missing-label">volvo-240-drift-camper.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Volvo 240 Drift Camper</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="optimus prime">
+        <div class="photo-slot" data-file="optimus-prime.jpg">
+          <img src="photos/optimus-prime.jpg" onerror="this.parentElement.classList.add('missing')" alt="Optimus Prime">
+          <div class="missing-label">optimus-prime.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Optimus Prime</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s9">
+      <div class="series-head">
+        <h2>ULTRA HOTS 2024</h2>
+        <span class="series-count">8 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="64 dodge 330">
+        <div class="photo-slot" data-file="64-dodge-330.jpg">
+          <img src="photos/64-dodge-330.jpg" onerror="this.parentElement.classList.add('missing')" alt="64 Dodge 330">
+          <div class="missing-label">64-dodge-330.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">64 Dodge 330</div>
+          <div class="card-num">1/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="71 datsun 510">
+        <div class="photo-slot" data-file="71-datsun-510.jpg">
+          <img src="photos/71-datsun-510.jpg" onerror="this.parentElement.classList.add('missing')" alt="71 Datsun 510">
+          <div class="missing-label">71-datsun-510.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">71 Datsun 510</div>
+          <div class="card-num">2/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="nissan skyline h/t 2000 gt-x">
+        <div class="photo-slot" data-file="nissan-skyline-h-t-2000-gt-x.jpg">
+          <img src="photos/nissan-skyline-h-t-2000-gt-x.jpg" onerror="this.parentElement.classList.add('missing')" alt="Nissan Skyline H/T 2000 GT-X">
+          <div class="missing-label">nissan-skyline-h-t-2000-gt-x.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Nissan Skyline H/T 2000 GT-X</div>
+          <div class="card-num">3/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="78 porsche 935-78">
+        <div class="photo-slot" data-file="78-porsche-935-78.jpg">
+          <img src="photos/78-porsche-935-78.jpg" onerror="this.parentElement.classList.add('missing')" alt="78 Porsche 935-78">
+          <div class="missing-label">78-porsche-935-78.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">78 Porsche 935-78</div>
+          <div class="card-num">4/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="toyota ae86 sprinter trueno">
+        <div class="photo-slot" data-file="toyota-ae86-sprinter-trueno.jpg">
+          <img src="photos/toyota-ae86-sprinter-trueno.jpg" onerror="this.parentElement.classList.add('missing')" alt="Toyota AE86 Sprinter Trueno">
+          <div class="missing-label">toyota-ae86-sprinter-trueno.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Toyota AE86 Sprinter Trueno</div>
+          <div class="card-num">5/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="85 honda city turbo ii">
+        <div class="photo-slot" data-file="85-honda-city-turbo-ii.jpg">
+          <img src="photos/85-honda-city-turbo-ii.jpg" onerror="this.parentElement.classList.add('missing')" alt="85 Honda City Turbo II">
+          <div class="missing-label">85-honda-city-turbo-ii.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">85 Honda City Turbo II</div>
+          <div class="card-num">6/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="86 ford thunderbird pro stock">
+        <div class="photo-slot" data-file="86-ford-thunderbird-pro-stock.jpg">
+          <img src="photos/86-ford-thunderbird-pro-stock.jpg" onerror="this.parentElement.classList.add('missing')" alt="86 Ford Thunderbird Pro Stock">
+          <div class="missing-label">86-ford-thunderbird-pro-stock.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">86 Ford Thunderbird Pro Stock</div>
+          <div class="card-num">7/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="custom volkswagen beetle (chase)">
+        <div class="photo-slot" data-file="custom-volkswagen-beetle-chase.jpg">
+          <img src="photos/custom-volkswagen-beetle-chase.jpg" onerror="this.parentElement.classList.add('missing')" alt="Custom Volkswagen Beetle (Chase)">
+          <div class="missing-label">custom-volkswagen-beetle-chase.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Custom Volkswagen Beetle (Chase)</div>
+          <div class="card-num">8/8</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s10">
+      <div class="series-head">
+        <h2>ULTRA HOTS 2025</h2>
+        <span class="series-count">8 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="70 ford escort rs1600">
+        <div class="photo-slot" data-file="70-ford-escort-rs1600.jpg">
+          <img src="photos/70-ford-escort-rs1600.jpg" onerror="this.parentElement.classList.add('missing')" alt="70 Ford Escort RS1600">
+          <div class="missing-label">70-ford-escort-rs1600.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">70 Ford Escort RS1600</div>
+          <div class="card-num">1/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="volkswagen t1-gtr">
+        <div class="photo-slot" data-file="volkswagen-t1-gtr.jpg">
+          <img src="photos/volkswagen-t1-gtr.jpg" onerror="this.parentElement.classList.add('missing')" alt="Volkswagen T1-GTR">
+          <div class="missing-label">volkswagen-t1-gtr.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Volkswagen T1-GTR</div>
+          <div class="card-num">2/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="89 mazda savanna rx-7 fc 3s">
+        <div class="photo-slot" data-file="89-mazda-savanna-rx-7-fc-3s.jpg">
+          <img src="photos/89-mazda-savanna-rx-7-fc-3s.jpg" onerror="this.parentElement.classList.add('missing')" alt="89 Mazda Savanna RX-7 FC 3S">
+          <div class="missing-label">89-mazda-savanna-rx-7-fc-3s.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">89 Mazda Savanna RX-7 FC 3S</div>
+          <div class="card-num">3/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="88 honda cr-x">
+        <div class="photo-slot" data-file="88-honda-cr-x.jpg">
+          <img src="photos/88-honda-cr-x.jpg" onerror="this.parentElement.classList.add('missing')" alt="88 Honda CR-X">
+          <div class="missing-label">88-honda-cr-x.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">88 Honda CR-X</div>
+          <div class="card-num">4/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 356 outlaw">
+        <div class="photo-slot" data-file="porsche-356-outlaw.jpg">
+          <img src="photos/porsche-356-outlaw.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 356 Outlaw">
+          <div class="missing-label">porsche-356-outlaw.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 356 Outlaw</div>
+          <div class="card-num">5/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="65 pontiac gto">
+        <div class="photo-slot" data-file="65-pontiac-gto.jpg">
+          <img src="photos/65-pontiac-gto.jpg" onerror="this.parentElement.classList.add('missing')" alt="65 Pontiac GTO">
+          <div class="missing-label">65-pontiac-gto.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">65 Pontiac GTO</div>
+          <div class="card-num">6/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="81 toyota starlet kp61">
+        <div class="photo-slot" data-file="81-toyota-starlet-kp61.jpg">
+          <img src="photos/81-toyota-starlet-kp61.jpg" onerror="this.parentElement.classList.add('missing')" alt="81 Toyota Starlet KP61">
+          <div class="missing-label">81-toyota-starlet-kp61.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">81 Toyota Starlet KP61</div>
+          <div class="card-num">7/8</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="69 copo corvette">
+        <div class="photo-slot" data-file="69-copo-corvette.jpg">
+          <img src="photos/69-copo-corvette.jpg" onerror="this.parentElement.classList.add('missing')" alt="69 Copo Corvette">
+          <div class="missing-label">69-copo-corvette.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">69 Copo Corvette</div>
+          <div class="card-num">8/8</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s11">
+      <div class="series-head">
+        <h2>SPEED GRAPHICS</h2>
+        <span class="series-count">5 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="99 honda civic type r ek9">
+        <div class="photo-slot" data-file="99-honda-civic-type-r-ek9.jpg">
+          <img src="photos/99-honda-civic-type-r-ek9.jpg" onerror="this.parentElement.classList.add('missing')" alt="99 Honda Civic Type R EK9">
+          <div class="missing-label">99-honda-civic-type-r-ek9.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">99 Honda Civic Type R EK9</div>
+          <div class="card-num">1/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="range rover classic">
+        <div class="photo-slot" data-file="range-rover-classic.jpg">
+          <img src="photos/range-rover-classic.jpg" onerror="this.parentElement.classList.add('missing')" alt="Range Rover Classic">
+          <div class="missing-label">range-rover-classic.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Range Rover Classic</div>
+          <div class="card-num">2/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 914 safari">
+        <div class="photo-slot" data-file="porsche-914-safari.jpg">
+          <img src="photos/porsche-914-safari.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 914 Safari">
+          <div class="missing-label">porsche-914-safari.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 914 Safari</div>
+          <div class="card-num">3/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mazda rx-3">
+        <div class="photo-slot" data-file="mazda-rx-3.jpg">
+          <img src="photos/mazda-rx-3.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mazda RX-3">
+          <div class="missing-label">mazda-rx-3.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mazda RX-3</div>
+          <div class="card-num">4/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="big-air bel-air">
+        <div class="photo-slot" data-file="big-air-bel-air.jpg">
+          <img src="photos/big-air-bel-air.jpg" onerror="this.parentElement.classList.add('missing')" alt="Big-Air Bel-Air">
+          <div class="missing-label">big-air-bel-air.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Big-Air Bel-Air</div>
+          <div class="card-num">5/5</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s12">
+      <div class="series-head">
+        <h2>GIFT SET</h2>
+        <span class="series-count">2 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="mopar">
+        <div class="photo-slot" data-file="mopar.jpg">
+          <img src="photos/mopar.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mopar">
+          <div class="missing-label">mopar.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mopar</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="hw remote adventures">
+        <div class="photo-slot" data-file="hw-remote-adventures.jpg">
+          <img src="photos/hw-remote-adventures.jpg" onerror="this.parentElement.classList.add('missing')" alt="HW Remote Adventures">
+          <div class="missing-label">hw-remote-adventures.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">HW Remote Adventures</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s13">
+      <div class="series-head">
+        <h2>HWs HONDA</h2>
+        <span class="series-count">5 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="90 honda civic ef">
+        <div class="photo-slot" data-file="90-honda-civic-ef.jpg">
+          <img src="photos/90-honda-civic-ef.jpg" onerror="this.parentElement.classList.add('missing')" alt="90 Honda Civic EF">
+          <div class="missing-label">90-honda-civic-ef.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">90 Honda Civic EF</div>
+          <div class="card-num">1/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="92 honda civic eg">
+        <div class="photo-slot" data-file="92-honda-civic-eg.jpg">
+          <img src="photos/92-honda-civic-eg.jpg" onerror="this.parentElement.classList.add('missing')" alt="92 Honda Civic EG">
+          <div class="missing-label">92-honda-civic-eg.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">92 Honda Civic EG</div>
+          <div class="card-num">2/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="honda civic si">
+        <div class="photo-slot" data-file="honda-civic-si.jpg">
+          <img src="photos/honda-civic-si.jpg" onerror="this.parentElement.classList.add('missing')" alt="Honda Civic SI">
+          <div class="missing-label">honda-civic-si.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Honda Civic SI</div>
+          <div class="card-num">3/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="16 honda civic type r">
+        <div class="photo-slot" data-file="16-honda-civic-type-r.jpg">
+          <img src="photos/16-honda-civic-type-r.jpg" onerror="this.parentElement.classList.add('missing')" alt="16 Honda Civic Type R">
+          <div class="missing-label">16-honda-civic-type-r.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">16 Honda Civic Type R</div>
+          <div class="card-num">4/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="2018 honda civic type r">
+        <div class="photo-slot" data-file="2018-honda-civic-type-r.jpg">
+          <img src="photos/2018-honda-civic-type-r.jpg" onerror="this.parentElement.classList.add('missing')" alt="2018 Honda Civic Type R">
+          <div class="missing-label">2018-honda-civic-type-r.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">2018 Honda Civic Type R</div>
+          <div class="card-num">5/5</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s14">
+      <div class="series-head">
+        <h2>HWs GRAN TURISMO</h2>
+        <span class="series-count">5 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="73 bmw 3.0 csl race car">
+        <div class="photo-slot" data-file="73-bmw-3-0-csl-race-car.jpg">
+          <img src="photos/73-bmw-3-0-csl-race-car.jpg" onerror="this.parentElement.classList.add('missing')" alt="73 BMW 3.0 CSL Race Car">
+          <div class="missing-label">73-bmw-3-0-csl-race-car.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">73 BMW 3.0 CSL Race Car</div>
+          <div class="card-num">1/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="2017 nissan gt-r r35">
+        <div class="photo-slot" data-file="2017-nissan-gt-r-r35.jpg">
+          <img src="photos/2017-nissan-gt-r-r35.jpg" onerror="this.parentElement.classList.add('missing')" alt="2017 Nissan GT-R R35">
+          <div class="missing-label">2017-nissan-gt-r-r35.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">2017 Nissan GT-R R35</div>
+          <div class="card-num">2/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 911 gt3 rs">
+        <div class="photo-slot" data-file="porsche-911-gt3-rs.jpg">
+          <img src="photos/porsche-911-gt3-rs.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 911 GT3 RS">
+          <div class="missing-label">porsche-911-gt3-rs.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 911 GT3 RS</div>
+          <div class="card-num">3/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="20 ford mustang shelby gt500">
+        <div class="photo-slot" data-file="20-ford-mustang-shelby-gt500.jpg">
+          <img src="photos/20-ford-mustang-shelby-gt500.jpg" onerror="this.parentElement.classList.add('missing')" alt="20 Ford Mustang Shelby GT500">
+          <div class="missing-label">20-ford-mustang-shelby-gt500.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">20 Ford Mustang Shelby GT500</div>
+          <div class="card-num">4/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="20 toyota gr supra">
+        <div class="photo-slot" data-file="20-toyota-gr-supra.jpg">
+          <img src="photos/20-toyota-gr-supra.jpg" onerror="this.parentElement.classList.add('missing')" alt="20 Toyota GR Supra">
+          <div class="missing-label">20-toyota-gr-supra.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">20 Toyota GR Supra</div>
+          <div class="card-num">5/5</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s15">
+      <div class="series-head">
+        <h2>HWs DEUTSCHLAND DESIGN</h2>
+        <span class="series-count">5 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="mercedes-benz sprinter">
+        <div class="photo-slot" data-file="mercedes-benz-sprinter.jpg">
+          <img src="photos/mercedes-benz-sprinter.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mercedes-Benz Sprinter">
+          <div class="missing-label">mercedes-benz-sprinter.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mercedes-Benz Sprinter</div>
+          <div class="card-num">1/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="audi s4 quattro">
+        <div class="photo-slot" data-file="audi-s4-quattro.jpg">
+          <img src="photos/audi-s4-quattro.jpg" onerror="this.parentElement.classList.add('missing')" alt="Audi S4 Quattro">
+          <div class="missing-label">audi-s4-quattro.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Audi S4 Quattro</div>
+          <div class="card-num">2/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 911 gt3 rs">
+        <div class="photo-slot" data-file="porsche-911-gt3-rs.jpg">
+          <img src="photos/porsche-911-gt3-rs.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 911 GT3 RS">
+          <div class="missing-label">porsche-911-gt3-rs.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 911 GT3 RS</div>
+          <div class="card-num">3/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="12 mercedes-benz c63 amg coupe black series">
+        <div class="photo-slot" data-file="12-mercedes-benz-c63-amg-coupe-black-series.jpg">
+          <img src="photos/12-mercedes-benz-c63-amg-coupe-black-series.jpg" onerror="this.parentElement.classList.add('missing')" alt="12 Mercedes-Benz C63 AMG Coupe Black Series">
+          <div class="missing-label">12-mercedes-benz-c63-amg-coupe-black-series.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">12 Mercedes-Benz C63 AMG Coupe Black Series</div>
+          <div class="card-num">4/5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="1994 amg mercedes c-class dtm touring car">
+        <div class="photo-slot" data-file="1994-amg-mercedes-c-class-dtm-touring-car.jpg">
+          <img src="photos/1994-amg-mercedes-c-class-dtm-touring-car.jpg" onerror="this.parentElement.classList.add('missing')" alt="1994 AMG Mercedes C-Class DTM Touring Car">
+          <div class="missing-label">1994-amg-mercedes-c-class-dtm-touring-car.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">1994 AMG Mercedes C-Class DTM Touring Car</div>
+          <div class="card-num">5/5</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s16">
+      <div class="series-head">
+        <h2>HWs CAR CULTURE</h2>
+        <span class="series-count">2 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="volkswagen jetta mk3 & id r">
+        <div class="photo-slot" data-file="volkswagen-jetta-mk3-id-r.jpg">
+          <img src="photos/volkswagen-jetta-mk3-id-r.jpg" onerror="this.parentElement.classList.add('missing')" alt="Volkswagen Jetta MK3 & ID R">
+          <div class="missing-label">volkswagen-jetta-mk3-id-r.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Volkswagen Jetta MK3 & ID R</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="05 toyota land cruiser prado & mercedes-benz sprinter tourer">
+        <div class="photo-slot" data-file="05-toyota-land-cruiser-prado-mercedes-benz-sprinter-tourer.jpg">
+          <img src="photos/05-toyota-land-cruiser-prado-mercedes-benz-sprinter-tourer.jpg" onerror="this.parentElement.classList.add('missing')" alt="05 Toyota Land Cruiser Prado & Mercedes-Benz Sprinter Tourer">
+          <div class="missing-label">05-toyota-land-cruiser-prado-mercedes-benz-sprinter-tourer.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">05 Toyota Land Cruiser Prado & Mercedes-Benz Sprinter Tourer</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s17">
+      <div class="series-head">
+        <h2>HWs CAR CULTURE (CONTAINER SET)</h2>
+        <span class="series-count">2 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="american scene">
+        <div class="photo-slot" data-file="american-scene.jpg">
+          <img src="photos/american-scene.jpg" onerror="this.parentElement.classList.add('missing')" alt="American Scene">
+          <div class="missing-label">american-scene.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">American Scene</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="speed machines">
+        <div class="photo-slot" data-file="speed-machines.jpg">
+          <img src="photos/speed-machines.jpg" onerror="this.parentElement.classList.add('missing')" alt="Speed Machines">
+          <div class="missing-label">speed-machines.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Speed Machines</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s18">
+      <div class="series-head">
+        <h2>HWs FAST & FURIOUS</h2>
+        <span class="series-count">1 car</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="1967 chevy camaro offroad">
+        <div class="photo-slot" data-file="1967-chevy-camaro-offroad.jpg">
+          <img src="photos/1967-chevy-camaro-offroad.jpg" onerror="this.parentElement.classList.add('missing')" alt="1967 Chevy Camaro Offroad">
+          <div class="missing-label">1967-chevy-camaro-offroad.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">1967 Chevy Camaro Offroad</div>
+          <div class="card-num">2/5</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s19">
+      <div class="series-head">
+        <h2>HWs TEAM TRANSPORT</h2>
+        <span class="series-count">12 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="71 datsun 510 fleet flyer">
+        <div class="photo-slot" data-file="71-datsun-510-fleet-flyer.jpg">
+          <img src="photos/71-datsun-510-fleet-flyer.jpg" onerror="this.parentElement.classList.add('missing')" alt="71 Datsun 510 Fleet Flyer">
+          <div class="missing-label">71-datsun-510-fleet-flyer.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">71 Datsun 510 Fleet Flyer</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="24 nissan 300zx gts euro hauler">
+        <div class="photo-slot" data-file="24-nissan-300zx-gts-euro-hauler.jpg">
+          <img src="photos/24-nissan-300zx-gts-euro-hauler.jpg" onerror="this.parentElement.classList.add('missing')" alt="24 Nissan 300ZX GTS Euro Hauler">
+          <div class="missing-label">24-nissan-300zx-gts-euro-hauler.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">24 Nissan 300ZX GTS Euro Hauler</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="nissan skyline ht 2000 gt-x sakura sprinter (jdm)">
+        <div class="photo-slot" data-file="nissan-skyline-ht-2000-gt-x-sakura-sprinter-jdm.jpg">
+          <img src="photos/nissan-skyline-ht-2000-gt-x-sakura-sprinter-jdm.jpg" onerror="this.parentElement.classList.add('missing')" alt="Nissan Skyline HT 2000 GT-X Sakura Sprinter (JDM)">
+          <div class="missing-label">nissan-skyline-ht-2000-gt-x-sakura-sprinter-jdm.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Nissan Skyline HT 2000 GT-X Sakura Sprinter (JDM)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mercedes-benz 300sl euro hauler (iwc racing)">
+        <div class="photo-slot" data-file="mercedes-benz-300sl-euro-hauler-iwc-racing.jpg">
+          <img src="photos/mercedes-benz-300sl-euro-hauler-iwc-racing.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mercedes-Benz 300SL Euro Hauler (IWC Racing)">
+          <div class="missing-label">mercedes-benz-300sl-euro-hauler-iwc-racing.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mercedes-Benz 300SL Euro Hauler (IWC Racing)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="sauber mercedes fleet flyer">
+        <div class="photo-slot" data-file="sauber-mercedes-fleet-flyer.jpg">
+          <img src="photos/sauber-mercedes-fleet-flyer.jpg" onerror="this.parentElement.classList.add('missing')" alt="Sauber Mercedes Fleet Flyer">
+          <div class="missing-label">sauber-mercedes-fleet-flyer.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Sauber Mercedes Fleet Flyer</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="70 plymouth aar cuda sakura sprinter">
+        <div class="photo-slot" data-file="70-plymouth-aar-cuda-sakura-sprinter.jpg">
+          <img src="photos/70-plymouth-aar-cuda-sakura-sprinter.jpg" onerror="this.parentElement.classList.add('missing')" alt="70 Plymouth AAR Cuda Sakura Sprinter">
+          <div class="missing-label">70-plymouth-aar-cuda-sakura-sprinter.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">70 Plymouth AAR Cuda Sakura Sprinter</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 917 lh fleet flyer (gulf)">
+        <div class="photo-slot" data-file="porsche-917-lh-fleet-flyer-gulf.jpg">
+          <img src="photos/porsche-917-lh-fleet-flyer-gulf.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 917 LH Fleet Flyer (Gulf)">
+          <div class="missing-label">porsche-917-lh-fleet-flyer-gulf.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 917 LH Fleet Flyer (Gulf)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="porsche 962 sakura sprinter (shell)">
+        <div class="photo-slot" data-file="porsche-962-sakura-sprinter-shell.jpg">
+          <img src="photos/porsche-962-sakura-sprinter-shell.jpg" onerror="this.parentElement.classList.add('missing')" alt="Porsche 962 Sakura Sprinter (Shell)">
+          <div class="missing-label">porsche-962-sakura-sprinter-shell.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Porsche 962 Sakura Sprinter (Shell)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="nissan skyline fleet flyer (lbwk)">
+        <div class="photo-slot" data-file="nissan-skyline-fleet-flyer-lbwk.jpg">
+          <img src="photos/nissan-skyline-fleet-flyer-lbwk.jpg" onerror="this.parentElement.classList.add('missing')" alt="Nissan Skyline Fleet Flyer (LBWK)">
+          <div class="missing-label">nissan-skyline-fleet-flyer-lbwk.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Nissan Skyline Fleet Flyer (LBWK)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="toyota off-road truck fleet street">
+        <div class="photo-slot" data-file="toyota-off-road-truck-fleet-street.jpg">
+          <img src="photos/toyota-off-road-truck-fleet-street.jpg" onerror="this.parentElement.classList.add('missing')" alt="Toyota Off-Road Truck Fleet Street">
+          <div class="missing-label">toyota-off-road-truck-fleet-street.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Toyota Off-Road Truck Fleet Street</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="18 toyota 4runner & 89 toyota supra">
+        <div class="photo-slot" data-file="18-toyota-4runner-89-toyota-supra.jpg">
+          <img src="photos/18-toyota-4runner-89-toyota-supra.jpg" onerror="this.parentElement.classList.add('missing')" alt="18 Toyota 4Runner & 89 Toyota Supra">
+          <div class="missing-label">18-toyota-4runner-89-toyota-supra.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">18 Toyota 4Runner & 89 Toyota Supra</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="70 plymouth superbird wide open">
+        <div class="photo-slot" data-file="70-plymouth-superbird-wide-open.jpg">
+          <img src="photos/70-plymouth-superbird-wide-open.jpg" onerror="this.parentElement.classList.add('missing')" alt="70 Plymouth Superbird Wide Open">
+          <div class="missing-label">70-plymouth-superbird-wide-open.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">70 Plymouth Superbird Wide Open</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s20">
+      <div class="series-head">
+        <h2>HWs RAD TRUCK SERIES</h2>
+        <span class="series-count">1 car</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="custom ford bronco">
+        <div class="photo-slot" data-file="custom-ford-bronco.jpg">
+          <img src="photos/custom-ford-bronco.jpg" onerror="this.parentElement.classList.add('missing')" alt="Custom Ford Bronco">
+          <div class="missing-label">custom-ford-bronco.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Custom Ford Bronco</div>
+          <div class="card-num">6/8</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s21">
+      <div class="series-head">
+        <h2>HWs HALL OF FAME</h2>
+        <span class="series-count">10 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="ed big daddy roth (legends)">
+        <div class="photo-slot" data-file="ed-big-daddy-roth-legends.jpg">
+          <img src="photos/ed-big-daddy-roth-legends.jpg" onerror="this.parentElement.classList.add('missing')" alt="Ed Big Daddy Roth (Legends)">
+          <div class="missing-label">ed-big-daddy-roth-legends.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Ed Big Daddy Roth (Legends)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="carroll shelby (legends)">
+        <div class="photo-slot" data-file="carroll-shelby-legends.jpg">
+          <img src="photos/carroll-shelby-legends.jpg" onerror="this.parentElement.classList.add('missing')" alt="Carroll Shelby (Legends)">
+          <div class="missing-label">carroll-shelby-legends.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Carroll Shelby (Legends)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="reeves callaway (legends)">
+        <div class="photo-slot" data-file="reeves-callaway-legends.jpg">
+          <img src="photos/reeves-callaway-legends.jpg" onerror="this.parentElement.classList.add('missing')" alt="Reeves Callaway (Legends)">
+          <div class="missing-label">reeves-callaway-legends.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Reeves Callaway (Legends)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="larry wood (legends)">
+        <div class="photo-slot" data-file="larry-wood-legends.jpg">
+          <img src="photos/larry-wood-legends.jpg" onerror="this.parentElement.classList.add('missing')" alt="Larry Wood (Legends)">
+          <div class="missing-label">larry-wood-legends.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Larry Wood (Legends)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="zora arkus-duntov (legends)">
+        <div class="photo-slot" data-file="zora-arkus-duntov-legends.jpg">
+          <img src="photos/zora-arkus-duntov-legends.jpg" onerror="this.parentElement.classList.add('missing')" alt="Zora Arkus-Duntov (Legends)">
+          <div class="missing-label">zora-arkus-duntov-legends.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Zora Arkus-Duntov (Legends)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="robert e. peterson (legends)">
+        <div class="photo-slot" data-file="robert-e-peterson-legends.jpg">
+          <img src="photos/robert-e-peterson-legends.jpg" onerror="this.parentElement.classList.add('missing')" alt="Robert E. Peterson (Legends)">
+          <div class="missing-label">robert-e-peterson-legends.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Robert E. Peterson (Legends)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="gordon miller buehrig (legends)">
+        <div class="photo-slot" data-file="gordon-miller-buehrig-legends.jpg">
+          <img src="photos/gordon-miller-buehrig-legends.jpg" onerror="this.parentElement.classList.add('missing')" alt="Gordon Miller Buehrig (Legends)">
+          <div class="missing-label">gordon-miller-buehrig-legends.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Gordon Miller Buehrig (Legends)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="robert lutz (legends)">
+        <div class="photo-slot" data-file="robert-lutz-legends.jpg">
+          <img src="photos/robert-lutz-legends.jpg" onerror="this.parentElement.classList.add('missing')" alt="Robert Lutz (Legends)">
+          <div class="missing-label">robert-lutz-legends.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Robert Lutz (Legends)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="deuce roadster (greatest rides)">
+        <div class="photo-slot" data-file="deuce-roadster-greatest-rides.jpg">
+          <img src="photos/deuce-roadster-greatest-rides.jpg" onerror="this.parentElement.classList.add('missing')" alt="Deuce Roadster (Greatest Rides)">
+          <div class="missing-label">deuce-roadster-greatest-rides.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Deuce Roadster (Greatest Rides)</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="plymouth gtx (greatest rides)">
+        <div class="photo-slot" data-file="plymouth-gtx-greatest-rides.jpg">
+          <img src="photos/plymouth-gtx-greatest-rides.jpg" onerror="this.parentElement.classList.add('missing')" alt="Plymouth GTX (Greatest Rides)">
+          <div class="missing-label">plymouth-gtx-greatest-rides.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Plymouth GTX (Greatest Rides)</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s22">
+      <div class="series-head">
+        <h2>HWs 1:43</h2>
+        <span class="series-count">4 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="nissan skyline gt-r with nismo parts">
+        <div class="photo-slot" data-file="nissan-skyline-gt-r-with-nismo-parts.jpg">
+          <img src="photos/nissan-skyline-gt-r-with-nismo-parts.jpg" onerror="this.parentElement.classList.add('missing')" alt="Nissan Skyline GT-R with NISMO Parts">
+          <div class="missing-label">nissan-skyline-gt-r-with-nismo-parts.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Nissan Skyline GT-R with NISMO Parts</div>
+          <div class="card-num">5</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mercedes amg gt3">
+        <div class="photo-slot" data-file="mercedes-amg-gt3.jpg">
+          <img src="photos/mercedes-amg-gt3.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mercedes AMG GT3">
+          <div class="missing-label">mercedes-amg-gt3.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mercedes AMG GT3</div>
+          <div class="card-num">6</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="mercedes-benz 300 sel 6.8 amg">
+        <div class="photo-slot" data-file="mercedes-benz-300-sel-6-8-amg.jpg">
+          <img src="photos/mercedes-benz-300-sel-6-8-amg.jpg" onerror="this.parentElement.classList.add('missing')" alt="Mercedes-Benz 300 SEL 6.8 AMG">
+          <div class="missing-label">mercedes-benz-300-sel-6-8-amg.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Mercedes-Benz 300 SEL 6.8 AMG</div>
+          <div class="card-num">9</div>
+        </div>
+      </div>
+      <div class="card fade-in" data-name="23 corvette z06">
+        <div class="photo-slot" data-file="23-corvette-z06.jpg">
+          <img src="photos/23-corvette-z06.jpg" onerror="this.parentElement.classList.add('missing')" alt="23 Corvette Z06">
+          <div class="missing-label">23-corvette-z06.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">23 Corvette Z06</div>
+          <div class="card-num">10</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s23">
+      <div class="series-head">
+        <h2>HWs 55TH ANNIVERSARY</h2>
+        <span class="series-count">1 car</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="twin mill">
+        <div class="photo-slot" data-file="twin-mill.jpg">
+          <img src="photos/twin-mill.jpg" onerror="this.parentElement.classList.add('missing')" alt="Twin Mill">
+          <div class="missing-label">twin-mill.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Twin Mill</div>
+          <div class="card-num">2/6</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s24">
+      <div class="series-head">
+        <h2>HWs 52ND ANNIVERSARY</h2>
+        <span class="series-count">1 car</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="32 ford">
+        <div class="photo-slot" data-file="32-ford.jpg">
+          <img src="photos/32-ford.jpg" onerror="this.parentElement.classList.add('missing')" alt="32 Ford">
+          <div class="missing-label">32-ford.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">32 Ford</div>
+          <div class="card-num">2/6</div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s25">
+      <div class="series-head">
+        <h2>HWs 51ST ANNIVERSARY</h2>
+        <span class="series-count">1 car</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="gotta go (chase)">
+        <div class="photo-slot" data-file="gotta-go-chase.jpg">
+          <img src="photos/gotta-go-chase.jpg" onerror="this.parentElement.classList.add('missing')" alt="Gotta Go (Chase)">
+          <div class="missing-label">gotta-go-chase.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Gotta Go (Chase)</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s26">
+      <div class="series-head">
+        <h2>HOTWHEELS POP CULTURE 2025</h2>
+        <span class="series-count">1 car</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="kool kambi">
+        <div class="photo-slot" data-file="kool-kambi.jpg">
+          <img src="photos/kool-kambi.jpg" onerror="this.parentElement.classList.add('missing')" alt="Kool Kambi">
+          <div class="missing-label">kool-kambi.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Kool Kambi</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s27">
+      <div class="series-head">
+        <h2>HOTWHEELS COLLECTIBLES</h2>
+        <span class="series-count">1 car</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="70 plymouth superbird">
+        <div class="photo-slot" data-file="70-plymouth-superbird.jpg">
+          <img src="photos/70-plymouth-superbird.jpg" onerror="this.parentElement.classList.add('missing')" alt="70 Plymouth Superbird">
+          <div class="missing-label">70-plymouth-superbird.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">70 Plymouth Superbird</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+    <section class="series-block" id="s28">
+      <div class="series-head">
+        <h2>MATCHBOX MOVING PARTS</h2>
+        <span class="series-count">2 cars</span>
+      </div>
+      <div class="card-grid">
+        
+      <div class="card fade-in" data-name="2022 nissan townstar">
+        <div class="photo-slot" data-file="2022-nissan-townstar.jpg">
+          <img src="photos/2022-nissan-townstar.jpg" onerror="this.parentElement.classList.add('missing')" alt="2022 Nissan Townstar">
+          <div class="missing-label">2022-nissan-townstar.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">2022 Nissan Townstar</div>
+          
+        </div>
+      </div>
+      <div class="card fade-in" data-name="2022 opel mokka">
+        <div class="photo-slot" data-file="2022-opel-mokka.jpg">
+          <img src="photos/2022-opel-mokka.jpg" onerror="this.parentElement.classList.add('missing')" alt="2022 Opel Mokka">
+          <div class="missing-label">2022-opel-mokka.jpg</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">2022 Opel Mokka</div>
+          
+        </div>
+      </div>
+      </div>
+    </section>
+</main>
+
+<footer>The Collection · Personal Inventory · 246 Cars · 29 Series</footer>
+
+<script>
+  // scroll fade-in
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+
+  // search filter
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase();
+    document.querySelectorAll('.card').forEach(card => {
+      card.style.display = card.dataset.name.includes(q) ? '' : 'none';
+    });
+    document.querySelectorAll('.series-block').forEach(block => {
+      const anyVisible = [...block.querySelectorAll('.card')].some(c => c.style.display !== 'none');
+      block.style.display = anyVisible ? '' : 'none';
+    });
+  });
+
+  // theme toggle removed - light mode only
+</script>
+
+</body>
+</html>
